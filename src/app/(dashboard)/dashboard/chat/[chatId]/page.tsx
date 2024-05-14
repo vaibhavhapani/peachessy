@@ -27,8 +27,8 @@ async function getChatMessages(chatId: string) {
 
     const dbMessages = results.map((message) => JSON.parse(message) as Message);
 
-    const reversedMessages = dbMessages.reverse();
-    const messages = messageArrayValidator.parse(reversedMessages);
+    const reversedMesages = dbMessages.reverse();
+    const messages = messageArrayValidator.parse(reversedMesages);
 
     return messages;
   } catch (error) {
@@ -56,7 +56,7 @@ const page: FC<pageProps> = async ({ params }: pageProps) => {
   const initialMessages = await getChatMessages(chatId);
 
   return (
-    <div className="flex-1 justify-between flex flex-col h-4 max-h[calc(100vh-6rem)]">
+    <div className="flex-1 justify-between flex flex-col h-full max-h-[calc(100vh-1rem)]">
       <div className="flex sm:items-center justify-between py-3 border-b-2 border-gray-200">
         <div className="relative flex items-center space-x-4">
           <div className="relative">
@@ -70,7 +70,7 @@ const page: FC<pageProps> = async ({ params }: pageProps) => {
               />
             </div>
           </div>
-          <div className="flex flex-col loading-tight">
+          <div className="flex flex-col leading-tight">
             <div className="text-xl flex items-center">
               <span className="text-gray-700 mr-3 font-semibold">
                 {chatPartner.name}
@@ -80,8 +80,13 @@ const page: FC<pageProps> = async ({ params }: pageProps) => {
           </div>
         </div>
       </div>
-      <Messages initialMessages={initialMessages} sessionId={session.user.id}/> 
-      <ChatInput chatId={chatId} chatPartner={chatPartner}/>
+      <Messages
+        initialMessages={initialMessages}
+        sessionId={session.user.id}
+        sessionImg={session.user.image}
+        chatPartner={chatPartner}
+      />
+      <ChatInput chatId={chatId} chatPartner={chatPartner} />
     </div>
   );
 };

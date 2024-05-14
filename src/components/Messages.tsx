@@ -2,13 +2,22 @@
 
 import { cn } from "@/lib/utils";
 import { FC, useRef, useState } from "react";
+import { format } from "date-fns";
+import Image from "next/image";
 
 interface MessagesProps {
   initialMessages: Message[];
   sessionId: string;
+  sessionImg: string | null | undefined;
+  chatPartner: User;
 }
 
-const Messages: FC<MessagesProps> = ({ initialMessages, sessionId }) => {
+const Messages: FC<MessagesProps> = ({
+  initialMessages,
+  sessionId,
+  sessionImg,
+  chatPartner,
+}) => {
   const [messages, setMessages] = useState<Message[]>(initialMessages);
   const scrollDownRef = useRef<HTMLDivElement | null>(null);
   return (
@@ -43,7 +52,7 @@ const Messages: FC<MessagesProps> = ({ initialMessages, sessionId }) => {
                   )}
                 >
                   <span
-                    className={cn("px-4 py-2 rounded-lg inline-block", {
+                    className={cn("px-4 py-1 mt-1.5 rounded-lg inline-block", {
                       "bg-indigo-600 text-white": isCurrentUser,
                       "bg-gray-200 text-gray-900": !isCurrentUser,
                       "rounded-br-none":
@@ -54,9 +63,26 @@ const Messages: FC<MessagesProps> = ({ initialMessages, sessionId }) => {
                   >
                     {message.text}{" "}
                     <span className="ml-2 text-xs text-gray-400">
-                      {message.timestamp}
+                      {format(message.timestamp, "HH:mm")}
                     </span>
                   </span>
+                </div>
+                <div
+                  className={cn("relative w-6 h-6 ", {
+                    "order-2": isCurrentUser,
+                    "order-1": !isCurrentUser,
+                    invisible: hasNextMessageFromSameUser,
+                  })}
+                >
+                  <Image
+                    fill
+                    src={
+                      isCurrentUser ? (sessionImg as string) : chatPartner.image
+                    }
+                    alt="Profile Picture"
+                    referrerPolicy="no-referrer"
+                    className="rounded-full"
+                  ></Image>
                 </div>
               </div>
             </div>

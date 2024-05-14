@@ -3,7 +3,7 @@
 import { FC, useRef, useState } from "react";
 import TextareaAutosize from "react-textarea-autosize";
 import Button from "./ui/Button";
-import { Send } from "lucide-react";
+import { SendHorizontal } from "lucide-react";
 import axios from "axios";
 import toast from "react-hot-toast";
 
@@ -31,12 +31,13 @@ const ChatInput: FC<ChatInputProps> = ({ chatPartner, chatId }) => {
   };
 
   return (
-    <div className="border-t border-gray-200 px-4 pt-4 mb-2 sm:mb-0">
-      <div className="relative flex-1 overflow-hidden rounded-lg shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-indigo-600">
+    <div className="border-gray-200 px-4 pt-4 mb-2 sm:mb-0">
+      <div className="relative flex overflow-hidden rounded-lg shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-indigo-600">
         <TextareaAutosize
+        maxRows={6}
           ref={textareaRef}
           onKeyDown={(e) => {
-            if (e.key === "Enter" && e.shiftKey) {
+            if (e.key === "Enter" && !e.shiftKey) {
               e.preventDefault();
               sendMessage();
             }
@@ -47,22 +48,14 @@ const ChatInput: FC<ChatInputProps> = ({ chatPartner, chatId }) => {
           placeholder={`Message ${chatPartner.name}`}
           className="block w-full resize-none border-0 bg-transparent text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:py-1.5 sm:text-sm sm:leading-6"
         />
-        <div
-          onClick={() => textareaRef.current?.focus()}
-          className="py-2"
-          aria-hidden="true"
+        <Button
+          className=""
+          isLoading={loading}
+          onClick={sendMessage}
+          type="submit"
         >
-          <div className="py-px">
-            <div className="h-8" />
-          </div>
-        </div>
-        <div className="absolute right-0 bottom-0 flex justify-between py-2 pl-3 pr-2">
-          <div className="flex-shrink-0">
-            <Button isLoading={loading} onClick={sendMessage} type="submit">
-              <Send />
-            </Button>
-          </div>
-        </div>
+          <SendHorizontal />
+        </Button>
       </div>
     </div>
   );
