@@ -41,7 +41,7 @@ const Messages: FC<MessagesProps> = ({
         toPusherKey(`chat:${chatId}`)
       );
     };
-  }, [sessionId]);
+  }, [sessionId, chatId]);
 
   return (
     <div

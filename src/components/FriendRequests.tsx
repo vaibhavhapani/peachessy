@@ -22,7 +22,6 @@ const FriendRequests: FC<FriendRequestsProps> = ({
   );
 
   useEffect(() => {
-    console.log(friendRequests)
     const channel = pusherClient.subscribe(
       toPusherKey(`user:${sessionId}:incoming_friend_requests`)
     );
@@ -32,7 +31,6 @@ const FriendRequests: FC<FriendRequestsProps> = ({
       senderEmail,
     }: IncomingFriendRequest) => {
       setFriendRequests((prev) => [...prev, { senderId, senderEmail }]);
-      console.log(friendRequests)
     };
 
     // The bind method is used to bind an event handler function to a specific event on the channel.
