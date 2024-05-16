@@ -1,6 +1,8 @@
 import { fetchRedis } from "@/app/helpers/redis";
 import { authOptions } from "@/lib/auth";
 import { db } from "@/lib/db";
+import { pusherServer } from "@/lib/pusher";
+import { toPusherKey } from "@/lib/utils";
 import { addFriendValidator } from "@/lib/validations/add-friend";
 import { getServerSession } from "next-auth";
 import { z } from "zod";
@@ -29,10 +31,11 @@ export async function POST(req: Request) {
     }
 
     const session = await getServerSession(authOptions);
-
     if (!session) {
       return new Response("Unauthorized", { status: 401 });
     }
+
+    //************************* verify the request ************************ */
 
     if (idToAdd === session.user.id) {
       return new Response("You can't add yourself as friend", {
@@ -60,7 +63,18 @@ export async function POST(req: Request) {
       return new Response("Already a friend", { status: 400 });
     }
 
+    /*********************** after verification add to db and publish ***********************************/
+
     db.sadd(`user:${idToAdd}:incoming_friend_requests`, session.user.id);
+
+    pusherServer.trigger(
+      toPusherKey(`user:${idToAdd}:incoming_friend_requests`), // channel to trigger the event on
+      "incoming_friend_requests", // name of the event to trigger
+      {
+        senderId: session.user.id,    // data payload
+        sendEmail: session.user.email,
+      }
+    );
 
     return new Response("OK");
   } catch (error) {

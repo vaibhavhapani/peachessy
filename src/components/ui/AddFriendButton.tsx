@@ -24,6 +24,8 @@ const AddFriendButton: FC<AddFriendButtonProps> = ({}) => {
     resolver: zodResolver(addFriendValidator),
   });
 
+  console.log(errors.email?.message);
+
   const addFriend = async (email: string) => {
     try {
       const validateEmail = addFriendValidator.parse({ email });
@@ -41,9 +43,9 @@ const AddFriendButton: FC<AddFriendButtonProps> = ({}) => {
 
       if (error instanceof AxiosError) {
         setError("email", { message: error.response?.data });
+      } else {
+        setError("email", { message: "Something went wrong!" });
       }
-
-      // setError("email", { message: "Something went wrong!" });
     }
   };
 
@@ -70,7 +72,7 @@ const AddFriendButton: FC<AddFriendButtonProps> = ({}) => {
         </div>
         <p className="mt-1 text-sm text-red-600">{errors.email?.message}</p>
         {showSuccessState ? (
-          <p className="mt-1 text-sm text-green-600">Response message sent</p>
+          <p className="mt-1 text-sm text-green-600">Friend Request sent</p>
         ) : null}
       </form>
     </>

@@ -1,14 +1,16 @@
 "use client";
 
-import { cn } from "@/lib/utils";
-import { FC, useRef, useState } from "react";
+import { cn, toPusherKey } from "@/lib/utils";
+import { FC, useEffect, useRef, useState } from "react";
 import { format } from "date-fns";
 import Image from "next/image";
+import { pusherClient } from "@/lib/pusher";
 
 interface MessagesProps {
   initialMessages: Message[];
   sessionId: string;
   sessionImg: string | null | undefined;
+  chatId: string;
   chatPartner: User;
 }
 
@@ -16,10 +18,31 @@ const Messages: FC<MessagesProps> = ({
   initialMessages,
   sessionId,
   sessionImg,
+  chatId,
   chatPartner,
 }) => {
   const [messages, setMessages] = useState<Message[]>(initialMessages);
   const scrollDownRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const channel = pusherClient.subscribe(
+      toPusherKey(`chat:${chatId}`)
+    );
+
+    const messageHandler = (message: Message) => {
+      setMessages((prev) => [...prev, message])
+    }
+    
+    channel.bind("incoming_messages", messageHandler);
+
+    return () => {
+      channel.unbind("incoming_messages", messageHandler);
+      pusherClient.unsubscribe(
+        toPusherKey(`chat:${chatId}`)
+      );
+    };
+  }, [sessionId]);
+
   return (
     <div
       id="messages"
@@ -30,7 +53,9 @@ const Messages: FC<MessagesProps> = ({
           const isCurrentUser = message.senderId === sessionId;
 
           const hasNextMessageFromSameUser =
-            messages[index - 1]?.senderId === messages[index].senderId;
+            messages[index+1]?.senderId === messages[index].senderId;
+          
+          const hasPrevMessageFromSameUser = messages[index-1]?.senderId === messages[index].senderId
 
           return (
             <div
@@ -52,13 +77,14 @@ const Messages: FC<MessagesProps> = ({
                   )}
                 >
                   <span
-                    className={cn("px-4 py-1 mt-1.5 rounded-lg inline-block", {
+                    className={cn("px-4 py-1 mt-1 rounded-lg inline-block", {
                       "bg-indigo-600 text-white": isCurrentUser,
                       "bg-gray-200 text-gray-900": !isCurrentUser,
                       "rounded-br-none":
                         !hasNextMessageFromSameUser && isCurrentUser,
                       "rounded-bl-none":
                         !hasNextMessageFromSameUser && !isCurrentUser,
+                      "mt-2" : !hasPrevMessageFromSameUser && isCurrentUser
                     })}
                   >
                     {message.text}{" "}

@@ -4,7 +4,12 @@ import { db } from "@/lib/db";
 import { getServerSession } from "next-auth";
 import { nanoid } from "nanoid";
 import { z } from "zod";
-import { messageArrayValidator, messageValidator } from "@/lib/validations/message";
+import {
+  messageArrayValidator,
+  messageValidator,
+} from "@/lib/validations/message";
+import { pusherServer } from "@/lib/pusher";
+import { toPusherKey } from "@/lib/utils";
 
 export async function POST(req: Request) {
   try {
@@ -34,10 +39,11 @@ export async function POST(req: Request) {
       });
     }
 
-    const res = (await fetchRedis("get", `user:${session.user.id}`)) as string;
-    const sender = JSON.parse(res) as User;
+    // const res = (await fetchRedis("get", `user:${session.user.id}`)) as string;
+    // const sender = JSON.parse(res) as User;
 
     const timestamp = Date.now();
+
     const messageData: Message = {
       id: nanoid(),
       senderId: session.user.id,
@@ -47,6 +53,12 @@ export async function POST(req: Request) {
     };
 
     const message = messageValidator.parse(messageData);
+
+    pusherServer.trigger(
+      toPusherKey(`chat:${chatId}`),
+      "incoming_messages",
+      message
+    );
 
     await db.zadd(`chat:${chatId}:messages`, {
       score: timestamp,

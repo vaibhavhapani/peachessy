@@ -18,6 +18,8 @@ const ChatInput: FC<ChatInputProps> = ({ chatPartner, chatId }) => {
   const [loading, setLoading] = useState<boolean>(false);
 
   const sendMessage = async () => {
+    if (!input) return;
+
     setLoading(true);
     try {
       await axios.post("/api/message/send", { text: input, chatId });
@@ -34,7 +36,7 @@ const ChatInput: FC<ChatInputProps> = ({ chatPartner, chatId }) => {
     <div className="border-gray-200 px-4 pt-4 mb-2 sm:mb-0">
       <div className="relative flex overflow-hidden rounded-lg shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-indigo-600">
         <TextareaAutosize
-        maxRows={6}
+          maxRows={6}
           ref={textareaRef}
           onKeyDown={(e) => {
             if (e.key === "Enter" && !e.shiftKey) {
@@ -50,7 +52,6 @@ const ChatInput: FC<ChatInputProps> = ({ chatPartner, chatId }) => {
         />
         <Button
           className=""
-          isLoading={loading}
           onClick={sendMessage}
           type="submit"
         >

@@ -27,8 +27,7 @@ async function getChatMessages(chatId: string) {
 
     const dbMessages = results.map((message) => JSON.parse(message) as Message);
 
-    const reversedMesages = dbMessages.reverse();
-    const messages = messageArrayValidator.parse(reversedMesages);
+    const messages = messageArrayValidator.parse(dbMessages);
 
     return messages;
   } catch (error) {
@@ -84,6 +83,7 @@ const page: FC<pageProps> = async ({ params }: pageProps) => {
         initialMessages={initialMessages}
         sessionId={session.user.id}
         sessionImg={session.user.image}
+        chatId={chatId}
         chatPartner={chatPartner}
       />
       <ChatInput chatId={chatId} chatPartner={chatPartner} />
