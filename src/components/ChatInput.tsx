@@ -3,9 +3,10 @@
 import { FC, useRef, useState } from "react";
 import TextareaAutosize from "react-textarea-autosize";
 import Button from "./ui/Button";
-import { SendHorizontal } from "lucide-react";
 import axios from "axios";
 import toast from "react-hot-toast";
+import { Icons } from "./ui/Icons";
+import { cn } from "@/lib/utils";
 
 interface ChatInputProps {
   chatPartner: User;
@@ -34,7 +35,7 @@ const ChatInput: FC<ChatInputProps> = ({ chatPartner, chatId }) => {
 
   return (
     <div className="border-gray-200 px-4 pt-4 mb-2 sm:mb-0">
-      <div className="relative flex overflow-hidden rounded-lg shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-indigo-600">
+      <div className="relative flex  items-center overflow-hidden rounded-lg shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-indigo-600">
         <TextareaAutosize
           maxRows={6}
           ref={textareaRef}
@@ -51,11 +52,11 @@ const ChatInput: FC<ChatInputProps> = ({ chatPartner, chatId }) => {
           className="block w-full resize-none border-0 bg-transparent text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:py-1.5 sm:text-sm sm:leading-6"
         />
         <Button
-          className=""
+          className={cn('bg-white hover:bg-slate-200 ring-inset m-1')}
           onClick={sendMessage}
           type="submit"
         >
-          <SendHorizontal />
+          <Icons.Logo className="h-6 w-auto text-indigo-600"></Icons.Logo>
         </Button>
       </div>
     </div>
