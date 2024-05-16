@@ -24,8 +24,6 @@ const AddFriendButton: FC<AddFriendButtonProps> = ({}) => {
     resolver: zodResolver(addFriendValidator),
   });
 
-  console.log(errors.email?.message);
-
   const addFriend = async (email: string) => {
     try {
       const validateEmail = addFriendValidator.parse({ email });

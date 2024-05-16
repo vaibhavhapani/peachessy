@@ -39,8 +39,8 @@ export async function POST(req: Request) {
       });
     }
 
-    // const res = (await fetchRedis("get", `user:${session.user.id}`)) as string;
-    // const sender = JSON.parse(res) as User;
+    const res = (await fetchRedis("get", `user:${session.user.id}`)) as string;
+    const sender = JSON.parse(res) as User;
 
     const timestamp = Date.now();
 
@@ -59,6 +59,12 @@ export async function POST(req: Request) {
       "incoming_messages",
       message
     );
+
+    pusherServer.trigger(toPusherKey(`user:${freindId}:chats`), "new_message", {
+      ...message,
+      senderImg: sender.image,
+      senderName: sender.name,
+    });
 
     await db.zadd(`chat:${chatId}:messages`, {
       score: timestamp,
