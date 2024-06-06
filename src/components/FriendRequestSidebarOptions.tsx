@@ -23,21 +23,27 @@ const FriendRequestSidebarOptions: FC<FriendRequestSidebarOptionsProps> = ({
     const channel = pusherClient.subscribe(
       toPusherKey(`user:${sessionId}:incoming_friend_requests`)
     );
+    pusherClient.subscribe(toPusherKey(`user:${sessionId}:friends`));
 
     const friendRequestsHandler = () => {
-      setUnseenRequestCount((prev) => prev+1)
-    }
-    
+      setUnseenRequestCount((prev) => prev + 1);
+    };
+
+    const addFriendHandler = () => {
+      setUnseenRequestCount((prev) => prev - 1);
+    };
+
     channel.bind("incoming_friend_requests", friendRequestsHandler);
+    channel.bind("new_friend", addFriendHandler);
 
     return () => {
       channel.unbind("incoming_friend_requests", friendRequestsHandler);
-      pusherClient.unsubscribe(
-        toPusherKey(`user:${sessionId}:incoming_friend_requests`)
-      );
+      channel.unbind("new_friend", addFriendHandler);
+
+      pusherClient.unsubscribe(toPusherKey(`user:${sessionId}:incoming_friend_requests`));
+      pusherClient.unsubscribe(toPusherKey(`user:${sessionId}:friends`));
     };
   }, [sessionId]);
-
 
   return (
     <Link
@@ -50,7 +56,9 @@ const FriendRequestSidebarOptions: FC<FriendRequestSidebarOptionsProps> = ({
       <p className="truncate">Friend Requests</p>
 
       {unseenRequestCount > 0 ? (
-        <div className="rounded-full w-5 h-5 text-xs flex justify-center items-center text-white bg-indigo-600">{unseenRequestCount}</div>
+        <div className="rounded-full w-5 h-5 text-xs flex justify-center items-center text-white bg-indigo-600">
+          {unseenRequestCount}
+        </div>
       ) : null}
     </Link>
   );
